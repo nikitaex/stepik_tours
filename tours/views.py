@@ -5,13 +5,13 @@ from random import sample
 from data import tours, title, subtitle, description, departures
 
 
-class MainView(View):
+class main_view(View):
     def get(self, request):
         return render(request, 'index.html', {'tours': sample(tours.items(), 6), 'title': title, 'subtitle': subtitle,
                                               'description': description, 'departures': departures.items()})
 
 
-class DepartureView(View):
+class departure_view(View):
     def get(self, request, departure):
         tours_by_departure = {}
         for tour_id, tour in tours.items():
@@ -36,7 +36,7 @@ class DepartureView(View):
                                                   'nights_min': nights_min, 'nights_max': nights_max})
 
 
-class TourView(View):
+class tour_view(View):
     def get(self, request, id):
         tour = tours[id]
         dep = departures[tour['departure']]
