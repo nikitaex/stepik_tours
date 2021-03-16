@@ -18,7 +18,7 @@
           {% for departure, name in departures %}
           <li class="nav-item">
             {% url 'departure' departure as departure_url %}
-            <a href={{ departure_url }} class="nav-link {% if request.path == departure_url %}active{% endif %}">{{name}}</a>
+            <a href={{ departure_url }} class="nav-link {% if request.path == departure_url %}active{% endif %}"> {{name}} </a>
           </li>
           {% endfor %}
         </ul>

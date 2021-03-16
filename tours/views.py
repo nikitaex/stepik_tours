@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponseServerError
 from django.views import View
 from random import sample
 from data import tours, title, subtitle, description, departures
@@ -18,7 +18,6 @@ class departure_view(View):
             if tour['departure'] == departure:
                 tour['departure_name'] = departures[tour['departure']]
                 tours_by_departure[tour_id] = tour
-        departure = departures[departure]
         count = len(tours_by_departure)
         price = []
         nights = []
@@ -29,6 +28,10 @@ class departure_view(View):
         price_max = max(price)
         nights_min = min(nights)
         nights_max = max(nights)
+        try:
+            departure = departures[departure]
+        except KeyError:
+            raise HttpResponseServerError
 
         return render(request, 'departure.html', {'departures': departures.items(), 'departure': departure,
                                                   'tours': tours_by_departure.items(), 'count': count,
@@ -38,10 +41,17 @@ class departure_view(View):
 
 class tour_view(View):
     def get(self, request, id):
-        tour = tours[id]
+        try:
+            tour = tours[id]
+        except KeyError:
+            raise HttpResponseServerError
         dep = departures[tour['departure']]
         return render(request, 'tour.html', {'departures': departures.items(), 'tour': tour, 'dep': dep})
 
 
 def custom_handler404(request, exception):
     return HttpResponseNotFound('Ой, что то сломалось... Простите извините!(404)')
+
+
+def custom_handler500(request):
+    return HttpResponseServerError('Ошибка сервера!')
