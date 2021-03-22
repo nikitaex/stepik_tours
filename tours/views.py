@@ -1,17 +1,17 @@
 from django.shortcuts import render
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
 from django.views import View
 from random import sample
 from data import tours, title, subtitle, description, departures
 
 
-class main_view(View):
+class MainView(View):
     def get(self, request):
         return render(request, 'index.html', {'tours': sample(tours.items(), 6), 'title': title, 'subtitle': subtitle,
                                               'description': description, 'departures': departures.items()})
 
 
-class departure_view(View):
+class DepartureView(View):
     def get(self, request, departure):
         tours_by_departure = {}
         for tour_id, tour in tours.items():
@@ -31,7 +31,7 @@ class departure_view(View):
         try:
             departure = departures[departure]
         except KeyError:
-            raise HttpResponseServerError
+            raise Http404
 
         return render(request, 'departure.html', {'departures': departures.items(), 'departure': departure,
                                                   'tours': tours_by_departure.items(), 'count': count,
@@ -39,12 +39,12 @@ class departure_view(View):
                                                   'nights_min': nights_min, 'nights_max': nights_max})
 
 
-class tour_view(View):
+class TourView(View):
     def get(self, request, id):
         try:
             tour = tours[id]
         except KeyError:
-            raise HttpResponseServerError
+            raise Http404
         dep = departures[tour['departure']]
         return render(request, 'tour.html', {'departures': departures.items(), 'tour': tour, 'dep': dep})
 
